@@ -27,7 +27,7 @@ internal class SizeLimitedProviderRegistryTest {
         tested.registerProvider(DefaultProvider())
         tested.registerProvider(DefaultProvider())
         tested.registerProvider(provider)
-        tested.dropProvider(provider.get())
+        tested.dropProvider(provider.key)
 
         assertTrue(tested.registerProvider(DefaultProvider()))
     }
@@ -86,7 +86,7 @@ internal class SizeLimitedProviderRegistryTest {
         tested.registerProvider(provider1)
         tested.registerProvider(provider2)
         tested.registerProvider(provider3)
-        tested.setExclusions(setOf(provider3.get()))
+        tested.setExclusions(setOf(provider3.key))
 
         assertEquals(setOf(provider1, provider2), tested.getProviders().values.toSet())
     }

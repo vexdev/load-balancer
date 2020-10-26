@@ -13,7 +13,7 @@ class SizeLimitedProviderRegistry(private val sizeLimit: Int = 10) : ProviderReg
     @Synchronized
     override fun registerProvider(provider: Provider): Boolean {
         if (registry.size >= sizeLimit) return false
-        return registry.putIfAbsent(provider.get(), provider) == null
+        return registry.putIfAbsent(provider.key, provider) == null
     }
 
     @Synchronized

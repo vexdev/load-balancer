@@ -94,7 +94,7 @@ internal class ExcludingHearthbeatCheckerTest {
 
     class FallableProvider : Provider {
         var fails: Boolean = false
-        val key: String = UUID.randomUUID().toString()
+        override val key: String = UUID.randomUUID().toString()
         override fun get(): String = if (fails) {
             throw RuntimeException("Something bad happened")
         } else {

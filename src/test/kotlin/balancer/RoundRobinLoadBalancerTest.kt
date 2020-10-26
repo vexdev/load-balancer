@@ -18,10 +18,10 @@ internal class RoundRobinLoadBalancerTest : LoadBalancerTest() {
         tested.registerProvider(provider2)
         tested.registerProvider(provider3)
 
-        assertEquals(provider1.get(), tested.get())
-        assertEquals(provider2.get(), tested.get())
-        assertEquals(provider3.get(), tested.get())
-        assertEquals(provider1.get(), tested.get())
+        assertEquals(provider1.key, tested.get())
+        assertEquals(provider2.key, tested.get())
+        assertEquals(provider3.key, tested.get())
+        assertEquals(provider1.key, tested.get())
     }
 
     @Test
@@ -36,8 +36,8 @@ internal class RoundRobinLoadBalancerTest : LoadBalancerTest() {
         tested.registerProvider(provider3)
         tested.get()
         tested.get()
-        tested.dropProvider(provider3.get())
+        tested.dropProvider(provider3.key)
 
-        assertEquals(provider1.get(), tested.get())
+        assertEquals(provider1.key, tested.get())
     }
 }

@@ -3,7 +3,10 @@ package balancer
 /**
  * Implements a load balancer by using a round robin approach over the [ProviderRegistry].
  */
-class RoundRobinLoadBalancer : LoadBalancer, ProviderRegistry by SizeLimitedProviderRegistry() {
+class RoundRobinLoadBalancer : LoadBalancer,
+    ProviderRegistry by SizeLimitedProviderRegistry(),
+    HeartbeatChecker {
+    val hearthbeatChecker = ExcludingHearthbeatChecker(this)
     var position: Int = -1
 
     @Synchronized
@@ -13,5 +16,7 @@ class RoundRobinLoadBalancer : LoadBalancer, ProviderRegistry by SizeLimitedProv
         position = (position + 1) % providers.size
         return providers.values.elementAt(position).get()
     }
+
+    override fun check() = hearthbeatChecker.check()
 
 }

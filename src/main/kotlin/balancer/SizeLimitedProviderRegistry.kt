@@ -8,6 +8,7 @@ import provider.Provider
 class SizeLimitedProviderRegistry(private val sizeLimit: Int = 10) : ProviderRegistry {
 
     private val registry = LinkedHashMap<String, Provider>(sizeLimit)
+    private val exclusions = mutableSetOf<String>()
 
     @Synchronized
     override fun registerProvider(provider: Provider): Boolean {
@@ -24,6 +25,17 @@ class SizeLimitedProviderRegistry(private val sizeLimit: Int = 10) : ProviderReg
     override fun getProvider(providerId: String): Provider? = registry[providerId]
 
     @Synchronized
-    override fun getProviders() = LinkedHashMap(registry)
+    override fun getProviders() = LinkedHashMap<String, Provider>(registry.size - exclusions.size).apply {
+        registry.filterNot { exclusions.contains(it.key) }
+            .forEach { (key, value) -> put(key, value) }
+    }
+
+    @Synchronized
+    override fun setExclusions(exclusions: Set<String>) {
+        this.exclusions.apply { clear() }.addAll(exclusions)
+    }
+
+    @Synchronized
+    override fun getExclusions(): Set<String> = this.exclusions.toSet()
 
 }

@@ -66,4 +66,28 @@ internal class SizeLimitedProviderRegistryTest {
         assertTrue(tested.getProviders().containsKey(provider.get()))
     }
 
+    @Test
+    internal fun exclusionListIsSetAndReturned() {
+        val tested = SizeLimitedProviderRegistry()
+        val exclusions = setOf("a", "b", "c")
+
+        tested.setExclusions(exclusions)
+
+        assertEquals(exclusions, tested.getExclusions())
+    }
+
+    @Test
+    internal fun exclusionListExcludesProviders() {
+        val tested = SizeLimitedProviderRegistry(3)
+        val provider1 = DefaultProvider()
+        val provider2 = DefaultProvider()
+        val provider3 = DefaultProvider()
+
+        tested.registerProvider(provider1)
+        tested.registerProvider(provider2)
+        tested.registerProvider(provider3)
+        tested.setExclusions(setOf(provider3.get()))
+
+        assertEquals(setOf(provider1, provider2), tested.getProviders().values.toSet())
+    }
 }

@@ -15,4 +15,12 @@ interface ProviderRegistry {
 
     fun getProviders(): LinkedHashMap<String, Provider>
 
+    /**
+     * Providers can be excluded by their Provider ID. If excluded they are still retained in the registry but they will
+     * not be returned from the [getProviders] method.
+     */
+    fun setExclusions(exclusions: Set<String>)
+
+    fun getExclusions(): Set<String>
+
 }

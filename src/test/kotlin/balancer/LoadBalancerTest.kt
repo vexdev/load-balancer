@@ -6,7 +6,6 @@ import provider.DefaultProvider
 import provider.Provider
 import java.util.*
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -41,7 +40,34 @@ internal abstract class LoadBalancerTest {
             countDownLatch.countDown()
         }
         blockingProvider.blocking = false
-        assertEquals(true, countDownLatch.await(3, TimeUnit.MILLISECONDS))
+        assertEquals(true, countDownLatch.await(100, TimeUnit.MILLISECONDS))
+    }
+
+    @Test
+    internal fun rejectsExtraRequests() {
+        val tested = createLoadBalancer()
+        val blockingProvider = BlockingProvider()
+        val countDownLatch = CountDownLatch(4)
+        var exceptionThrown = false
+        tested.registerProvider(blockingProvider)
+
+        callAndExpectException(tested, countDownLatch) { exceptionThrown = true }
+        callAndExpectException(tested, countDownLatch) { exceptionThrown = true }
+        callAndExpectException(tested, countDownLatch) { exceptionThrown = true }
+        callAndExpectException(tested, countDownLatch) { exceptionThrown = true }
+        assertEquals(false, countDownLatch.await(100, TimeUnit.MILLISECONDS))
+        assertTrue(exceptionThrown)
+    }
+
+    private fun callAndExpectException(tested: LoadBalancer, countDownLatch: CountDownLatch, onException: () -> Unit) {
+        thread {
+            try {
+                tested.get()
+            } catch (e: ConstantRateLimiter.MaxRequestsExceededException) {
+                onException()
+            }
+            countDownLatch.countDown()
+        }
     }
 
     abstract fun createLoadBalancer(): LoadBalancer
